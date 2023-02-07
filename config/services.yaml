@@ -35,6 +35,36 @@ services:
 
     Symfony\Component\Security\Http\Logout\LogoutUrlGenerator: '@security.logout_url_generator'
 
+    Seb\AuthenticatorBundle\Security\Policies\CreateUserIfAuthSucceeds:
+        arguments:
+            $userManager: '@App\Repository\UserRepository'
+    Seb\AuthenticatorBundle\Security\CredentialsProviders\FormCredentialsProvider:
+        arguments:
+            $options:
+                login_path: 'security_login'
+                login_check_path: 'security_login'
+
+    Seb\AuthenticatorBundle\Security\CredentialsCheckers\LocalCredentialsChecker: ~
+    Seb\AuthenticatorBundle\Security\Authenticator\PassportProvider:
+        arguments:
+            $credentialsChecker: '@Seb\AuthenticatorBundle\Security\CredentialsCheckers\LocalCredentialsChecker'
+            $missingUserPolicy: '@Seb\AuthenticatorBundle\Security\Policies\CreateUserIfAuthSucceeds'
+
+    Seb\AuthenticatorBundle\Security\Authenticator\SimpleAuthenticatedTokenProvider: ~
+    Seb\AuthenticatorBundle\Security\Policies\TargetPathOrHomePageRedirect: ~
+    Seb\AuthenticatorBundle\Security\Policies\RedirectOnBadCredentials:
+        arguments:
+            $redirectRoute: 'failed_login'
+
+    custom_authenticator:
+        class: 'Seb\AuthenticatorBundle\Security\Authenticator\Authenticator'
+        arguments:
+            $credentialsProvider: '@Seb\AuthenticatorBundle\Security\CredentialsProviders\FormCredentialsProvider'
+            $passportProvider: '@Seb\AuthenticatorBundle\Security\Authenticator\PassportProvider'
+            $authenticatedTokenProvider: '@Seb\AuthenticatorBundle\Security\Authenticator\SimpleAuthenticatedTokenProvider'
+            $successfulAuthenticationPolicy: '@Seb\AuthenticatorBundle\Security\Policies\TargetPathOrHomePageRedirect'
+            $badCredentialsPolicy: '@Seb\AuthenticatorBundle\Security\Policies\RedirectOnBadCredentials'
+
 when@test:
     services:
         test.user_password_hasher:

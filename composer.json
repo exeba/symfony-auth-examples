@@ -18,6 +18,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.10",
         "league/commonmark": "^2.1",
+        "seb/authenticator-bundle": "^3.1.4",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "^6.2",
         "symfony/console": "^6.2",

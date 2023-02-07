@@ -14,6 +14,10 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Seb\AuthenticatorBundle\Security\CredentialsProviders\FormCredentials;
+use Seb\AuthenticatorBundle\Security\UserManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * This custom Doctrine repository is empty because so far we don't need any custom
@@ -30,10 +34,35 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @template-extends ServiceEntityRepository<User>
  */
-class UserRepository extends ServiceEntityRepository
+class UserRepository extends ServiceEntityRepository implements UserManagerInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private $passwordEncoder;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        UserPasswordHasherInterface $passwordEncoder)
     {
         parent::__construct($registry, User::class);
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
+    public function createUser($userData)
+    {
+        if ($userData instanceof FormCredentials) {
+            $user = new User();
+            $user->setUsername($userData->getUsername());
+            $user->setFullName($userData->getUsername());
+            $user->setEmail($userData->getUsername().'@mail.com');
+            $user->setPassword($this->passwordEncoder->hashPassword($user, $userData->getPassword()));
+            $user->setRoles(['ROLE_USER']);
+
+            return $user;
+        }
+    }
+
+    public function persistUser(UserInterface $user)
+    {
+        $this->getEntityManager()->persist($user);
+        $this->getEntityManager()->flush();
     }
 }

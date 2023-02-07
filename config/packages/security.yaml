@@ -24,21 +24,6 @@ security:
             lazy: true
             provider: database_users
 
-            # This allows the user to login by submitting a username and password
-            # Reference: https://symfony.com/doc/current/security/form_login_setup.html
-            form_login:
-                # The route name that the login form submits to
-                check_path: security_login
-                # The name of the route where the login form lives
-                # When the user tries to access a protected page, they are redirected here
-                login_path: security_login
-                # Secure the login form against CSRF
-                # Reference: https://symfony.com/doc/current/security/csrf.html
-                enable_csrf: true
-                # The page users are redirect to when there is no previous page stored in the
-                # session (for example when the users access directly to the login page).
-                default_target_path: blog_index
-
             # This option allows users to choose to stay logged in for longer than
             # the session lasts using a cookie. Reference: https://symfony.com/doc/current/security/remember_me.html
             remember_me:
@@ -56,11 +41,13 @@ security:
                 # Secure the logout against CSRF
                 enable_csrf: true
 
+            custom_authenticators:
+                - custom_authenticator
             # needed because in tests we redefine the 'main' firewall to use
             # HTTP Basic instead of the login form, so this firewall has
             # multiple authenticators
             # See https://symfony.com/doc/current/security/experimental_authenticators.html#configuring-the-authentication-entry-point
-            entry_point: 'form_login'
+            entry_point: 'custom_authenticator'
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
