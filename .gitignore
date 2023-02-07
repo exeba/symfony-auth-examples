@@ -1,5 +1,7 @@
 .idea/
 
+tools/*/vendor/
+
 /public/build/fonts/glyphicons-*
 /public/build/images/glyphicons-*
 
